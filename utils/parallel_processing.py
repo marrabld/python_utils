@@ -34,10 +34,13 @@ def stupid_parallel(function, nprocesses=None):
     '''
     def apply(iterable_values, *args, **kwargs):
         args = list(args)
-        p = Pool(nprocesses)
-        result = [p.apply_async(function, args=[value]+args,
+        try:
+            p = Pool(nprocesses)
+            result = [p.apply_async(function, args=[value]+args,
                                 kwds=kwargs) 
                   for value in iterable_values]
-        p.close()
+        finally:
+            p.close()
+            p.join()
         return [r.get() for r in result]
     return apply
